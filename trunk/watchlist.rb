@@ -8,7 +8,6 @@ class StockWatch
   def initialize(stock, tgtprice)
     @stock = stock
     @tgtprice = tgtprice
-    @change = nil
   end
   
   def <=>(other)
@@ -21,7 +20,7 @@ class StockWatch
   end
   
   def to_s
-    sprintf("%15s\t%.2f\t%0.2f\t%.2f", @stock.symbol, @tgtprice, @stock.last, @change)
+    @stock.to_s + "\t" + @tgtprice.to_s
   end 
   
   def set_change(delta)
@@ -48,11 +47,17 @@ class Watchlist < Array
     self.each { |stockwatch| file.puts stockwatch.to_s+"\n" }
     file.close
   end
-  
+
+  # premature optimization :)
   def fill_quotes()
     quotes = Net::HTTP.get(URI.parse("http://in.finance.yahoo.com/d/quotes.csv?s="+self.get_tickers+"&f=l1c1&e=.csv"))
     i = 0
-    quotes.each("\n") { |quote| values = /(\d*\.\d*),(.\d*\.\d*)/.match(quote.chop); self.at(i).stock.parse_quote!(values[1]); self.at(i).set_change(values[2].to_f) ; i = i +1 }
+    quotes.each("\n") do |quote| 
+        values = /(\d*\.\d*),(.\d*\.\d*)/.match(quote.chop)
+        self.at(i).stock.parse_quote!(values[1])
+        self.at(i).set_change(values[2].to_f)
+        i = i +1
+    end
   end
   
   def get_tickers()
