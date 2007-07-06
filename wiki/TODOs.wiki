@@ -1,12 +1,8 @@
 #summary TODOs for the project
 
- * initial design							
- * make it fast, single query for a bunch of symbols			
- * exporting watchlist status						
  * auto-remove watchlist on buy signal
  * sort watchliststatus by spread
  * bse/nse arbitrage
  * buylist status
  * browser interface
  * repository
-
