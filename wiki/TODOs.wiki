@@ -3,6 +3,4 @@
  * auto-remove watchlist on buy signal
  * sort watchliststatus by spread
  * bse/nse arbitrage
- * buylist status
- * browser interface
- * repository
+
