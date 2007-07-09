@@ -1,6 +1,3 @@
-require 'net/http'
-require 'uri'
-
 class Stock
   attr_reader :symbol, :last, :change, :daylow
   attr_writer :last, :change, :daylow
@@ -10,5 +7,9 @@ class Stock
     @last = last
     @change = change
     @daylow = daylow
+  end
+
+  def to_s
+    @symbol + "\t" + @last.to_s + "\t" + @change.to_s + "\t" + @daylow.to_s
   end
 end
