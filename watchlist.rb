@@ -3,7 +3,7 @@ require 'stock'
 #WatchList Entry
 class StockWatch
   
-  attr_reader :stock, :tgtprice, :change
+  attr_reader :stock, :tgtprice
   
   def initialize(stock, tgtprice)
     @stock = stock
@@ -22,15 +22,10 @@ class StockWatch
   def to_s
     @stock.to_s + "\t" + @tgtprice.to_s
   end 
-  
-  def set_change(delta)
-    @change = delta*100/(@stock.last-delta)
-  end
 end
 
 # Watchlist is a list of StockWatch
 class Watchlist < Array
-  
   #Create a watchlist from a file
   def import(filepath)
     IO.foreach(filepath) do |nextline|
@@ -47,24 +42,4 @@ class Watchlist < Array
     self.each { |stockwatch| file.puts stockwatch.to_s+"\n" }
     file.close
   end
-
-  # premature optimization :)
-  def fill_quotes()
-    quotes = Net::HTTP.get(URI.parse("http://in.finance.yahoo.com/d/quotes.csv?s="+self.get_tickers+"&f=l1c1&e=.csv"))
-    i = 0
-    quotes.each("\n") do |quote| 
-        values = /(\d*\.\d*),(.\d*\.\d*)/.match(quote.chop)
-        self.at(i).stock.parse_quote!(values[1])
-        self.at(i).set_change(values[2].to_f)
-        i = i +1
-    end
-  end
-  
-  def get_tickers()
-    tickers = ""
-    self.each {|stockwatch| tickers << stockwatch.stock.get_ticker << "+"} 
-    #remove trailing '+'
-    tickers.chop
-  end
-  
 end
