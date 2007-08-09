@@ -1,7 +1,7 @@
 #~ StockAssist, a portfolio management application.
 #~   Homepage: <http://code.google.com/p/stockassist>
 #~  
-#~   Quotes module - Helper to get stock quotes.
+#~   Quotes class - Helper to get stock quotes.
 #~     Currently just a wrapper around YahooFinance module.
 #~    
 #~ Copyright (C) 2007 Paritosh Shah <shah DOT paritosh AT gmail DOT com>
@@ -19,38 +19,36 @@
 #~ You should have received a copy of the GNU General Public License
 #~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'net/http'
-require 'uri'
-require 'csv'
+require 'yahoofinance'
 
-module Quotes
-    def fill_quotes stocks
-        quotecsv = Net::HTTP.get(URI.parse("http://in.finance.yahoo.com/d/quotes.csv?s="+accum_tickers+"&f=sl1c1g&e=.csv"))
-        quotes = CSV.parse quotecsv
-        quotes.each_index do |i|
-            # sanity check
-            if quotes[i][0] =~ /stocks[i].symbol/
-                stocks[i].last = quotes[i][1].to_f
-                stocks[i].change = quotes[i][2].to_f
-                stocks[i].daylow = quotes[i][3].to_f
-            end
-        end
-    end
-    
-    #symbol: NSE symbol, ticker: Data feed symbol
-    #TODO: Try BSE if NSE fails
-    def get_ticker symbol
-        ticker = symbol[0..8]
-        if ticker =~ /\d+/
-            ticker << '.BO'
-        else
-            ticker << '.NS'
-        end
-        return ticker
-    end
+class Quotes
+	def get_quotes symbols
+		symlookup = Hash.new
+		tickers = symbols.collect do |symbol|
+			ticker = get_ticker symbol
+			# save the ticker->symbol mapping
+			symlookup[ticker] = symbol
+			ticker
+		end
 
-    # accumulate multiple symbols into TICK1+TICK2+...
-    def accum_tickers stocks
-        stocks.collect {|stock| get_ticker stock.symbol}.join('+')
-    end
+		ret = Hash.new
+		YahooFinance::get_quotes(YahooFinance::StandardQuote, tickers) do |qt|
+			if block_given?
+				yield qt
+			end
+			ret[symlookup[qt.symbol]] = qt
+		end
+	end
+
+	#symbol: NSE symbol, ticker: Data feed symbol
+	#TODO: Try BSE if NSE fails
+	def get_ticker symbol
+		ticker = symbol[0..8]
+		if ticker =~ /\d+/
+			ticker << '.BO'
+		else
+			ticker << '.NS'
+		end
+		return ticker
+	end
 end
