@@ -22,10 +22,10 @@
 require 'yahoofinance'
 
 class Quotes
-	def get_quotes symbols
+	def self.get_quotes symbols
 		symlookup = Hash.new
 		tickers = symbols.collect do |symbol|
-			ticker = get_ticker symbol
+			ticker = self.get_ticker symbol
 			# save the ticker->symbol mapping
 			symlookup[ticker] = symbol
 			ticker
@@ -38,12 +38,13 @@ class Quotes
 			end
 			ret[symlookup[qt.symbol]] = qt
 		end
+		return ret
 	end
 
 	#symbol: NSE symbol, ticker: Data feed symbol
-	#TODO: Try BSE if NSE fails
-	def get_ticker symbol
+	def self.get_ticker symbol
 		ticker = symbol[0..8]
+		ticker.strip!
 		if ticker =~ /\d+/
 			ticker << '.BO'
 		else

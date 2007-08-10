@@ -18,18 +18,21 @@
 #~ You should have received a copy of the GNU General Public License
 #~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+require 'quotes'
+
 class Stock
-  attr_reader :symbol, :last, :change, :daylow
-  attr_writer :last, :change, :daylow
+  attr_reader :symbol
   
-  def initialize(symbol, last=nil, change=nil, daylow=nil)
+  def initialize(symbol, qt=nil)
     @symbol = symbol
-    @last = last
-    @change = change
-    @daylow = daylow
+		@qt = qt
   end
 
-  def to_s
-    @symbol + "\t" + @last.to_s + "\t" + @change.to_s + "\t" + @daylow.to_s
-  end
+	def quote
+		@qt = Quotes::get_quotes([] << @symbol)[@symbol] if @qt.nil?
+	end
+
+	def set_quote qt
+		@qt = qt
+	end
 end
