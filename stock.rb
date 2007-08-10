@@ -21,7 +21,7 @@
 require 'quotes'
 
 class Stock
-  attr_reader :symbol
+  attr_reader :symbol, :qt
   
   def initialize(symbol, qt=nil)
     @symbol = symbol
@@ -34,5 +34,9 @@ class Stock
 
 	def set_quote qt
 		@qt = qt
+	end
+
+	def to_s
+		@symbol
 	end
 end

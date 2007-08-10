@@ -19,6 +19,7 @@
 #~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 require 'stock'
+require 'quotes'
 
 #WatchList Entry
 class StockWatch
@@ -36,7 +37,7 @@ class StockWatch
   
   # measure of closeness to tgtprice, useful in <=>
   def spread
-    (@stock.last - @tgtprice)/@stock.last
+    (@stock.quote.lastTrade - @tgtprice)/@stock.last
   end
   
   def to_s
@@ -44,22 +45,31 @@ class StockWatch
   end 
 end
 
-# Watchlist is a list of StockWatch
-class Watchlist < Array
+# Watchlist is a map of symbol => StockWatch
+class Watchlist < Hash 
+
   #Create a watchlist from a file
   def import(filepath)
     IO.foreach(filepath) do |nextline|
       tokens = Array.new
       nextline.each("\t") {|token| tokens.push token}
-      stock = Stock.new(tokens[0].chop)
+			symbol = tokens[0].chop
+      stock = Stock.new(symbol)
       tgtprice = tokens[1].chop.to_f
-      self.push StockWatch.new(stock, tgtprice)
+      self[symbol] = StockWatch.new(stock, tgtprice)
     end
   end
-  
+	
   def export(filepath)
     file = File.new filepath, "w"
-    self.each { |stockwatch| file.puts stockwatch.to_s+"\n" }
+    self.each { |symbol, stockwatch| file.puts stockwatch.to_s+"\n" }
     file.close
   end
+
+	#get quotes for all the stocks in the watchlist
+	def fill_quotes
+		qthash = Quotes::get_quotes(self.keys)
+		qthash.each_key { |key| self[key].stock.set_quote qthash[key] }
+	end
+
 end
