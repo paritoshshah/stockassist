@@ -20,15 +20,14 @@
 
 require 'stock'
 
-#WatchList Entry
+#BuyList Entry
 class BuyItem
   
-  attr_reader :stock, :buyprice, :buyqty
+  attr_reader :stock, :buyprice
   
-  def initialize(stock, buyprice, buyqty)
+  def initialize(stock, buyprice)
     @stock = stock
     @buyprice = buyprice
-    @buyqty = buyqty
   end
   
   def <=>(other)
@@ -37,17 +36,23 @@ class BuyItem
   
   # measure of closeness to buyprice, useful in <=>
   def spread
-    (@stock.last - @buyprice)/@stock.last
+		cur_price = @stock.quote.lastTrade
+    (cur_price - @buyprice)/cur_price
   end
   
   def to_s
-    @stock.symbol+"\t"+@buyprice.to_s+"\t"+@buyqty.to_s
+    @stock.to_s+"\t"+@buyprice.to_s+"\t"+buyqty.to_s
   end 
+
+	def buyqty
+		lotsize = 10000
+		(lotsize/buyprice).floor
+	end
   
 end
 
-# Buylist is a list of BuyItem(s)
-class Buylist < Array
+# Buylist is a map of symbol => BuyItem
+class Buylist < Hash
   
   #spit buylist to file
   def export(filepath)
