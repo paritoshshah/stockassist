@@ -37,7 +37,8 @@ class StockWatch
   
   # measure of closeness to tgtprice, useful in <=>
   def spread
-    (@stock.quote.lastTrade - @tgtprice)/@stock.last
+		cur_price = @stock.quote.lastTrade
+    (cur_price - @tgtprice)/cur_price
   end
   
   def to_s
