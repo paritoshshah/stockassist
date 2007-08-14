@@ -63,9 +63,20 @@ class Watchlist < Hash
 	
   def export(filepath)
     file = File.new filepath, "w"
-    self.each { |symbol, stockwatch| file.puts stockwatch.to_s+"\n" }
+    self.each_key { |symbol| file.puts self[symbol].to_s+"\n" }
     file.close
   end
+
+	def export_status(filepath)
+		file = File.new filepath, "w"
+		watch_stat = self.sort { |a, b| a[1] <=> b[1] }
+		watch_stat.each do |symbol, stockwatch|
+			stock = stockwatch.stock
+			tgtprice = stockwatch.tgtprice
+			file.printf "%15s\t%d\t%.1f\t%.1f\t%.2f\n", symbol, tgtprice, stock.quote.lastTrade, stock.quote.changePercent, stockwatch.spread
+		end
+		file.close
+	end
 
 	#get quotes for all the stocks in the watchlist
 	def fill_quotes

@@ -30,6 +30,7 @@ class Stock
 
 	def quote
 		@qt = Quotes::get_quotes([] << @symbol)[@symbol] if @qt.nil?
+		@qt
 	end
 
 	def set_quote qt

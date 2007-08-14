@@ -1,7 +1,7 @@
 #~ StockAssist, a portfolio management application.
 #~   Homepage: <http://code.google.com/p/stockassist>
 #~  
-#~   wlmanager - a makeshift controller, till we have a UI
+#~   stockassist - a makeshift controller, till we have a UI
 #~    
 #~ Copyright (C) 2007 Paritosh Shah <shah DOT paritosh AT gmail DOT com>
 #~
@@ -22,22 +22,21 @@ require 'stock'
 require 'watchlist'
 require 'buylist'
 
-LOTSIZE = 10000
-
+# read the watchlist
 watchlist = Watchlist.new
 watchlist.import('watchlist.txt')
 watchlist.fill_quotes
 
+# build a buylist from the watchlist
 buylist = Buylist.new
-
-watchlist.each do |stockwatch|
+watchlist.each_key do |symbol|
+	stockwatch = watchlist[symbol]
   if stockwatch.spread <= 0.05
-    buyqty = (LOTSIZE/stockwatch.tgtprice).floor
-    buyitem = BuyItem.new(stockwatch.stock, stockwatch.tgtprice, buyqty)
-    buylist.push buyitem
+    buyitem = BuyItem.new(stockwatch.stock, stockwatch.tgtprice)
+    buylist[symbol] = buyitem
   end
 end
 
+# export buylist and watchliststatus
 buylist.export('buylist.txt')
-watchlist.export('watchliststatus.txt')
-
+watchlist.export_status('watchliststatus.txt')
