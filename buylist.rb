@@ -57,7 +57,7 @@ class Buylist < Hash
   #spit buylist to file
   def export(filepath)
     file = File.new filepath, "w"
-    self.each { |buyitem| file.puts buyitem.to_s+"\n" }
+    self.each_key { |symbol| file.puts self[symbol].to_s+"\n" }
     file.close
   end
   
