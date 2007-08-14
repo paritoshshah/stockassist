@@ -22,21 +22,29 @@ require 'stock'
 require 'watchlist'
 require 'buylist'
 
-# read the watchlist
-watchlist = Watchlist.new
-watchlist.import('watchlist.txt')
-watchlist.fill_quotes
+# read the watchlists
+watchlist_buy = Watchlist.new
+watchlist_buy.import('watchlist_buy.txt')
+watchlist_buy.fill_quotes
+watchlist_sell = Watchlist.new
+watchlist_sell.import('watchlist_sell.txt')
+watchlist_sell.fill_quotes
 
-# build a buylist from the watchlist
+# build a buylist from watchlist_buy
 buylist = Buylist.new
-watchlist.each_key do |symbol|
-	stockwatch = watchlist[symbol]
+watchlist_buy.each_key do |symbol|
+	stockwatch = watchlist_buy[symbol]
   if stockwatch.spread <= 0.05
     buyitem = BuyItem.new(stockwatch.stock, stockwatch.tgtprice)
     buylist[symbol] = buyitem
   end
 end
 
+# build a selllist from watchlist_sell
+selllist = watchlist_sell.reject { |symbol, stockwatch| stockwatch.spread < -0.05 }
+
 # export buylist and watchliststatus
 buylist.export('buylist.txt')
-watchlist.export_status('watchliststatus.txt')
+watchlist_buy.export_status('buystatus.txt')
+watchlist_sell.export_status('sellstatus.txt')
+selllist.export('selllist.txt')
