@@ -14,13 +14,21 @@ class WatchlistEditorGlade
 		watchlist_model = WatchListModel.new
 		watchlist_model.populate('watchlist_buy.txt')
 
-		# define the view
-		stock = Gtk::TreeViewColumn.new("Stock",
-																		Gtk::CellRendererText.new,
-																		{:text => 0})
+		# define & populate the view
 		watchlist_view = @glade.get_widget("watchlist_view")
 		watchlist_view.model = watchlist_model
-		watchlist_view.append_column(stock)
+		WatchListModel::COLUMNS.each do |colid, colname, coltype, accessor|
+			renderer = Gtk::CellRendererText.new
+			column = Gtk::TreeViewColumn.new(colname, renderer)
+			column.set_cell_data_func(renderer) do |column, renderer, model, iter|
+				if coltype == Float
+					renderer.text = sprintf("%.2f", iter[colid])
+				else
+					renderer.text = iter[colid]
+				end
+			end
+			watchlist_view.append_column(column)
+		end
 		watchlist_view.selection.set_mode(Gtk::SELECTION_SINGLE)
     
   end
