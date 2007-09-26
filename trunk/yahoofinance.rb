@@ -175,7 +175,7 @@ module YahooFinance
     # Don't catch any exceptions!  Just let them be thrown.
     #
 #    begin
-      Net::HTTP.start( "finance.yahoo.com", 80 ) { |http|
+      Net::HTTP.start( "download.finance.yahoo.com", 80 ) { |http|
         http.read_timeout = timeout
         response = nil
 
