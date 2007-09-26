@@ -15,7 +15,7 @@ class WatchlistEditorGlade
 		watchlist_model.populate('watchlist_buy.txt')
 
 		# define & populate the view
-		watchlist_view = @glade.get_widget("watchlist_view")
+		watchlist_view = @glade.get_widget("watchlist")
 		watchlist_view.model = watchlist_model
 		WatchListModel::COLUMNS.each do |colid, colname, coltype, accessor|
 			renderer = Gtk::CellRendererText.new
@@ -54,5 +54,8 @@ class WatchlistEditorGlade
   def on_quit1_activate(widget)
     puts "on_quit1_activate() is not implemented yet."
   end
+	def on_dialog_open_clicked(widget)
+		puts "on_dialog_open_clicked() is not implemented yet."
+	end
 end
 
