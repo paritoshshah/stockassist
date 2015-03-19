@@ -1,0 +1,1 @@
+Just some features I thought were missing in portfolio manager apps.
